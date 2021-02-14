@@ -4,5 +4,5 @@ I'm developing a matching application for musicians and artist so they're able t
 # License
 The main code is licensed under the [GNU General Public License v3.0](https://github.com/GiiovanniK/project-tech/blob/main/LICENSE)
 
-# Credits
+# Contributors
 Giovanni Kornet
