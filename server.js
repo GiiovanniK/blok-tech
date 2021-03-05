@@ -64,20 +64,17 @@ app.post('/register-succesful', async (req, res) => {
     }
 });
 
-// app.post('/'), async (req, res) => {
-//     const user = users.find(user => user.username = req.body.username);
-//     if (user == null) {
-//         return res.status(400).send('Cannot find user');
-//     } try {
-//         if (await bcrypt.compare(req.body.password, user.password)) {
-//             res.send('Succes');
-//         } else {
-//             res.send('No access');
-//         }
-//     } catch {
-//         res.status(500).send()
-//     }
-// }
+app.post('/login', async (req, res) => {
+    const user = await User.findOne({
+        email: req.body.email
+    });
+    if (!user) return res.status(400).send('Email is not found');
+    const validPassword = await bcrypt.compare(req.body.password, user.password);
+    if (!validPassword) return res.status(400).send('Invalid password');
+    res.render('index', {
+        username: user.username
+    });
+});
 
 // 404 error handling 
 app.get('*', (req, res) => {
