@@ -1,17 +1,29 @@
 const express = require('express');
-const path = require('path');
-const bodyParser = require('body-parser');
 const exphbs = require('express-handlebars');
-const User = require('./models/User.js');
+const session = require('express-session');
+const flash = require('express-flash');
+const passport = require('passport');
+const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt');
+const path = require('path');
 const mongoose = require('mongoose');
+
+//Config files - passportConfig.js, auth.js
+require('./config/passportConfig')(passport);
+const checkAuth = require('./config/auth');
+const checkNoAuth = require('./config/auth');
+
+// DB mongoose models
+const User = require('./models/User.js');
+
+// DB Connection
 const DBConnection = require('./connect.js');
 DBConnection(mongoose);
-const bcrypt = require('bcrypt');
+
 const app = express();
 const port = 8000;
 
 // Set view directory
-app.use(express.static('./static/public'));
 app.set('view engine', 'hbs');
 app.set("views", path.join(__dirname, "views"));
 
@@ -21,32 +33,16 @@ app.engine('hbs', exphbs({
 }));
 
 // Static file serving
+app.use(express.static('./static/public'));
 app.use('/static', express.static(path.join(__dirname, './static/public')));
 
-// Define all routes
-app.get('/', (req, res) => {
-    res.render('index');
-});
-
-app.get('/about', (req, res) => {
-    res.render('about');
-});
-
-app.get('/login', (req, res) => {
-    res.render('login');
-});
-
-app.get('/register', (req, res) => {
-    res.render('register');
-});
-
-// Form POST, store in DB
+// Register form POST, store in DB
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
 
-app.post('/register-succesful', async (req, res) => {
+app.post('/register', async (req, res) => {
     try {
         const salt = await bcrypt.genSalt()
         const hashedPassword = await bcrypt.hash(req.body.password, salt)
@@ -64,21 +60,58 @@ app.post('/register-succesful', async (req, res) => {
     }
 });
 
-app.post('/login', async (req, res) => {
-    const user = await User.findOne({
-        email: req.body.email
-    });
-    if (!user) return res.status(400).send('Email is not found');
-    const validPassword = await bcrypt.compare(req.body.password, user.password);
-    if (!validPassword) return res.status(400).send('Invalid password');
-    res.render('index', {
-        username: user.username
-    });
+// Authenticate users with DB
+// Express session
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false
+}));
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(flash());
+
+// Login
+app.post('/login', passport.authenticate('local', {
+        successRedirect: '/dashboard',
+        failureRedirect: '/login',
+        failureFlash: true
+}));
+
+// Logout
+app.get('/logout', (req, res) => {
+    req.logOut();
+    // req.flash('succes_msg', 'You are logged out');
+    res.redirect('login');
+});
+
+// Define all routes
+app.get('/', (req, res) => {
+    res.render('index');
+});
+
+app.get('/about', (req, res) => {
+    res.render('about');
+});
+
+app.get('/login', checkNoAuth.checkNotAuthenticated, (req, res) => {
+    res.render('login');
+});
+
+app.get('/register', checkNoAuth.checkNotAuthenticated, (req, res) => {
+    res.render('register');
+});
+
+app.get('/dashboard', checkAuth.checkAuthenticated, (req, res) => {
+    res.render('dashboard', {username: req.user.username });
 });
 
 // 404 error handling 
 app.get('*', (req, res) => {
-    res.send('This page does not exist!', 404);
+    res.status(404).send('This page does not exist!');
 });
 
 // Listen
