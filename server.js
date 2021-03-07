@@ -18,6 +18,9 @@ const User = require('./models/User.js');
 
 // DB Connection
 const DBConnection = require('./connect.js');
+const {
+    get
+} = require('http');
 DBConnection(mongoose);
 
 const app = express();
@@ -42,6 +45,7 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
+// Register
 app.post('/register', async (req, res) => {
     try {
         const salt = await bcrypt.genSalt()
@@ -76,10 +80,30 @@ app.use(flash());
 
 // Login
 app.post('/login', passport.authenticate('local', {
-        successRedirect: '/dashboard',
-        failureRedirect: '/login',
-        failureFlash: true
+    successRedirect: '/dashboard',
+    failureRedirect: '/login',
+    failureFlash: true
 }));
+
+// Update password and encrypt again
+app.post('/changePassword', async (req, res) => {
+    try {
+        const salt = await bcrypt.genSalt()
+        const hashedPassword = await bcrypt.hash(req.body.password, salt)
+        const filter = {
+            username: req.user.username
+        };
+        const user = await User.findOne({
+            username: req.user.username
+        });
+        await User.updateOne(filter, {
+            password: hashedPassword
+        });
+        await user.save()
+    } catch (err){
+        res.status(500).send();
+    }
+});
 
 // Logout
 app.get('/logout', (req, res) => {
@@ -88,7 +112,7 @@ app.get('/logout', (req, res) => {
     res.redirect('login');
 });
 
-// Define all routes
+// Routes
 app.get('/', (req, res) => {
     res.render('index');
 });
@@ -106,7 +130,13 @@ app.get('/register', checkNoAuth.checkNotAuthenticated, (req, res) => {
 });
 
 app.get('/dashboard', checkAuth.checkAuthenticated, (req, res) => {
-    res.render('dashboard', {username: req.user.username });
+    res.render('dashboard', {
+        username: req.user.username
+    });
+});
+
+app.get('/changePassword', checkNoAuth.checkAuthenticated, (req, res) => {
+    res.render('changePassword');
 });
 
 // 404 error handling 
