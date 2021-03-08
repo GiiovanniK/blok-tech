@@ -9,12 +9,42 @@
 </head>
 
 <body>
+    {{#> header title="Dashboard"}}
+    {{/header}}
+    <h2>Hello {{username}}!</h2>
+    <a href="/changePassword">Change Password</a>
+    <a href="/logout">Logout</a>
+    <a class="buttonAsLink" href="/userUpload">Create listing</a>
     <main>
-        <h1>Dashboard</h1>
-        <h2>Hello {{username}}!</h2>
-        <a href="/logout">Logout</a>
-        <a href="/changePassword">Change Password</a>
+        <button class="genreButton" id="jazz">Jazz</button>
+        <button class="genreButton" id="pop">Pop</button>
+        <button class="genreButton" id="edm">EDM</button>
+        <button class="genreButton" id="rock">Rock</button>
+        <button class="genreButton" id="hiphop">HipHop</button>
+        <table class="checkboxAlign">
+            {{#each data}}
+            <tr class="userDataCard">
+                {{#each this}}
+                {{#if this.username}}
+                <td>{{this.username}}</td>
+                {{/if}}
+                {{#if this.gender}}
+                <td>{{this.gender}}</td>
+                {{/if}}
+                {{#if this.skill}}
+                <td>{{this.skill}}</td>
+                {{/if}}
+                {{#if this.genre}}
+                <td>{{this.genre}}</td>
+                {{/if}}
+                {{/each}}
+            </tr>
+            {{/each}}
+        </table>
+
     </main>
+
+    <script src="./script/script.js"></script>
 </body>
 
 </html>

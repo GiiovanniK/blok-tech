@@ -1,3 +1,150 @@
+/* General */
+* {
+    margin: 0;
+    padding: 0;
+}
+
+/* Flash messages */
+.errorMsg {
+    color: red;
+    text-align: center;
+    margin-top: 1em;
+}
+
+/* Body */
 body {
-    background-color: grey;
+    background-color: #F2F7FC;
+}
+
+/* Header */
+.headerTitle>h1 {
+    color: white;
+    background-color: black;
+    padding: .75em 0 .75em 0;
+    text-align: center;
+}
+
+/* Flex parent */
+.flexParent {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+/* Card */
+.card {
+    background-color: white;
+    width: 90%;
+    padding: .5em 0 1em 0;
+    border-radius: 5px;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    box-shadow: 0 1px 20px 0 rgba(134, 134, 134, 0.15);
+}
+
+.buttonAsLink {
+    text-align: right;
+    padding: .75em;
+    text-decoration: none;
+    color: white;
+    background-color: dodgerblue;
+    border-radius: 5px;
+    box-shadow: 0 1px 20px 0 rgba(134, 134, 134, 0.15);
+    margin-bottom: 1em;
+}
+
+/* Form */
+form {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    width: 60%;
+    margin: auto;
+}
+
+form label {
+    font-weight: bold;
+}
+
+form>label:before {
+    content: "\A";
+    white-space: pre;
+}
+
+form input {
+    padding: .75em;
+    border: 1px solid black;
+    border-radius: 5px;
+}
+
+input:focus {
+    border: 1px solid dodgerblue;
+    border-radius: 5px;
+    outline: none
+}
+
+form button {
+    padding: .75em;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0px 2px 1px rgba(31, 58, 147, 1);
+    background-color: dodgerblue;
+    color: white;
+    margin-top: 1em;
+}
+
+.checkboxAlign {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 1em;
+}
+
+.checkboxAlign input {
+    margin-right: 5px;
+}
+
+.checkboxAlign label {
+    margin-right: 15px;
+}
+
+.checkboxAlign:before {
+    content: "\A";
+    white-space: pre;
+}
+
+/* Links to different routes */
+.routeLink {
+    text-align: center;
+    margin-top: 1em;
+}
+
+/* Dashboard User Data */
+.userDataCard {
+    background-color: white;
+    width: 100%;
+    text-align: center;
+    padding: .5em 0 1em 0;
+    margin: 1em 0 1em 0;
+    border-radius: 5px;
+    box-shadow: 0 1px 20px 0 rgba(134, 134, 134, 0.15);
+}
+
+/* Filter */
+.genreButton {
+    padding: .75em;
+    color: white;
+    background-color: dodgerblue;
+    border-radius: 5px;
+    border: none;
+    box-shadow: 0 1px 20px 0 rgba(134, 134, 134, 0.15);
+    margin-top: 5em;
+}
+
+/* Filter hide */
+.hidden {
+    display: none;
 }

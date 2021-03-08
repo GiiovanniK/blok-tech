@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Change password</title>
+</head>
+
+<body>
+    {{#> header title="Create listing"}}
+    {{/header}}
+    <form method="POST" action="/userUpload">
+        <label for="gender">Gender</label>
+        <div class="checkboxAlign">
+            <input type="radio" id="male" name="gender" value="male">
+            <label for="male">Male</label>
+            <input type="radio" id="female" name="gender" value="female">
+            <label for="female">Female</label>
+        </div>
+
+        <label for="skill">Skill</label>
+        <input type="text" name="skill" id="skill" placeholder="Vocalist, producer, pianist..." required>
+
+        <label for="genre">Select genre</label>
+        <div class="checkboxAlign">
+            <input type="checkbox" id="jazz" name="genre" value="Jazz">
+            <label for="jazz">Jazz</label>
+            <input type="checkbox" id="pop" name="genre" value="Pop">
+            <label for="pop">Pop</label>
+            <input type="checkbox" id="edm" name="genre" value="EDM">
+            <label for="edm">EDM</label>
+            <input type="checkbox" id="rock" name="genre" value="Rock">
+            <label for="rock">Rock</label>
+            <input type="checkbox" id="hiphop" name="genre" value="HipHop">
+            <label for="hiphop">HipHop</label>
+        </div>
+
+        <button type="submit">Submit</button>
+        <a class="routeLink" href="/dashboard">Return to dashboard</a>
+    </form>
+</body>
+
+</html>

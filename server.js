@@ -2,6 +2,8 @@ const express = require('express');
 const exphbs = require('express-handlebars');
 const session = require('express-session');
 const flash = require('express-flash');
+const handlebars = require('handlebars')
+const fs = require('fs');
 const passport = require('passport');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
@@ -15,12 +17,10 @@ const checkNoAuth = require('./config/auth');
 
 // DB mongoose models
 const User = require('./models/User.js');
+const userUpload = require('./models/userUpload.js');
 
 // DB Connection
 const DBConnection = require('./connect.js');
-const {
-    get
-} = require('http');
 DBConnection(mongoose);
 
 const app = express();
@@ -31,8 +31,12 @@ app.set('view engine', 'hbs');
 app.set("views", path.join(__dirname, "views"));
 
 app.engine('hbs', exphbs({
+    extname: '.hbs',
     defaultLayout: 'main',
-    extname: '.hbs'
+    layoutsDir: path.join(__dirname, 'views/layouts'),
+    partialsDir: [
+        path.join(__dirname, '/views/partials/'),
+    ]
 }));
 
 // Static file serving
@@ -90,18 +94,34 @@ app.post('/changePassword', async (req, res) => {
     try {
         const salt = await bcrypt.genSalt()
         const hashedPassword = await bcrypt.hash(req.body.password, salt)
-        const filter = {
-            username: req.user.username
-        };
         const user = await User.findOne({
             username: req.user.username
         });
-        await User.updateOne(filter, {
+        await User.updateOne(user, {
             password: hashedPassword
         });
         await user.save()
-    } catch (err){
+        res.redirect('login')
+    } catch {
         res.status(500).send();
+    }
+});
+
+app.post('/userUpload', async (req, res) => {
+    try {
+        const userupload = new userUpload({
+            username: req.user.username,
+            gender: req.body.gender,
+            skill: req.body.skill,
+            genre: req.body.genre
+        });
+        await userupload.save()
+            .then(() => {
+                res.redirect('login');
+            });
+    } catch (err) {
+        res.status(500).send();
+        console.log(err)
     }
 });
 
@@ -114,29 +134,48 @@ app.get('/logout', (req, res) => {
 
 // Routes
 app.get('/', (req, res) => {
-    res.render('index');
+    res.render('index', {
+        title: 'Home'
+    });
 });
 
 app.get('/about', (req, res) => {
-    res.render('about');
+    res.render('about', {
+        title: 'About'
+    });
 });
 
 app.get('/login', checkNoAuth.checkNotAuthenticated, (req, res) => {
-    res.render('login');
+    res.render('login', {
+        title: 'Login'
+    })
 });
 
 app.get('/register', checkNoAuth.checkNotAuthenticated, (req, res) => {
-    res.render('register');
+    res.render('register', {
+        title: 'Register'
+    })
 });
 
-app.get('/dashboard', checkAuth.checkAuthenticated, (req, res) => {
+app.get('/dashboard', checkAuth.checkAuthenticated, async (req, res) => {
+    const userupload = await userUpload.find().select('username gender skill genre');
     res.render('dashboard', {
-        username: req.user.username
+        username: req.user.username,
+        title: 'Dashboard',
+        data: userupload
     });
 });
 
 app.get('/changePassword', checkNoAuth.checkAuthenticated, (req, res) => {
-    res.render('changePassword');
+    res.render('changePassword', {
+        title: 'Change Password'
+    })
+});
+
+app.get('/userUpload', checkNoAuth.checkAuthenticated, (req, res) => {
+    res.render('userUpload', {
+        title: 'Create Listing'
+    })
 });
 
 // 404 error handling 
@@ -146,5 +185,5 @@ app.get('*', (req, res) => {
 
 // Listen
 app.listen(port, () => {
-    console.log(`App listening at http://localhost:${port}`);
+    console.log(`App listening at http://localhost:${port}/login`);
 });
