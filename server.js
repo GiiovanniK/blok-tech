@@ -24,7 +24,7 @@ const DBConnection = require('./connect.js');
 DBConnection(mongoose);
 
 const app = express();
-const port = 8000;
+const port = process.env.PORT || 8000;
 
 // Set view directory
 app.set('view engine', 'hbs');
