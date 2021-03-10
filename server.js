@@ -49,6 +49,20 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
+// Authenticate users with DB
+// Express session
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false
+}));
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(flash());
+
 // Register
 app.post('/register', async (req, res) => {
     try {
@@ -67,20 +81,6 @@ app.post('/register', async (req, res) => {
         res.status(500).send();
     }
 });
-
-// Authenticate users with DB
-// Express session
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false
-}));
-
-// Passport middleware
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.use(flash());
 
 // Login
 app.post('/login', passport.authenticate('local', {
